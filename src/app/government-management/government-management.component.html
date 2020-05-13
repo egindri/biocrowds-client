@@ -1,0 +1,130 @@
+<h2>Criar Estado</h2>
+<form name="government-management">
+	<div>
+		<div>
+			<label>Nome:</label>
+			<input [(ngModel)]="state.name" name="stateName" size="50" maxlength="50" type="text" required/>
+		</div>
+
+		<div>
+			<label>Bandeira:</label>
+			<input #flag type="file" (change)="onFileChanged($event)">
+		</div>
+
+		<div>
+			<button (click)="saveState()">Salvar</button>
+		</div>
+	</div>
+</form>
+
+<h2>Criar Cidades</h2>
+<form [formGroup]="citiesForm">
+	<div>
+		<table>
+			<tbody>
+				<tr>
+					<th>
+						Nome
+					</th>
+					<th>
+						Estado
+					</th>
+					<th>
+						Pop.
+					</th>
+				</tr>
+				<tr *ngFor="let city of cities.controls; let i = index" formArrayName="cities">
+					<ng-container [formGroup]="cities.controls[i]">
+
+						<td>
+							<input formControlName="name" name="stateName" size="50" maxlength="50"/>
+						</td>
+						<td>
+							<select formControlName="stateId">
+								<option [value]="state.stateId" *ngFor="let state of states">
+									{{state.name}}
+								</option>
+							</select>
+							<img [src]="obtainFlag(i)" width="100" height="60" />
+						</td>
+						<td>
+							<input formControlName="population" name="population" size="10" maxlength="10" type="number"/>
+						</td>
+						<td>
+							<button (click)="removeNewCity(i)">Remover</button>
+						</td>
+					</ng-container>
+				</tr>
+				<tr>
+					<button (click)="addCity()">Adicionar Cidade</button>
+					<button (click)="saveCities()">Salvar Cidades</button>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</form>
+
+<h2>Listar Estados</h2>
+<div>
+	<table>
+		<tbody>
+			<tr>
+				<th>
+					Nome
+				</th>
+				<th>
+					Pop.
+				</th>
+				<th>
+					Custo Populacional (R$)
+				</th>
+			</tr>
+			<tr *ngFor="let state of states">
+				<td>
+					{{state.name}}
+				</td>
+				<td>
+					{{state.population}}
+				</td>
+				<td>
+					{{state.populationCost}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<h2>Listar Cidades</h2>
+<form name="city-list">
+	<div>
+		<table>
+			<tbody>
+				<tr>
+					<th>
+						Nome
+					</th>
+					<th>
+						Estado
+					</th>
+					<th>
+						Pop.
+					</th>
+				</tr>
+				<tr *ngFor="let city of cityList">
+					<td>
+						{{city.name}}
+					</td>
+					<td>
+						{{city.stateName}}
+					</td>
+					<td>
+						{{city.population}}
+					</td>
+					<td>
+						<button (click)="removeCity(city.cityId)">Remover</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</form>
