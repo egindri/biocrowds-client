@@ -1,0 +1,29 @@
+<div class="biocrowds">
+	<div class="tools">
+		<div>
+			<label class="tool">
+				<input type="radio" name="tool" value="play" (click)="play()">
+				<img class="checkmark play" src="../../assets/images/play.png">
+			</label>
+			<label class="tool">
+				<input type="radio" name="tool" value="agent" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<img class="checkmark agent" src="../../assets/images/person.png">
+			</label>
+			<label class="tool">
+				<input type="radio" name="tool" value="goal" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<img class="checkmark goal" src="../../assets/images/target.png">
+			</label>
+			<label class="tool">
+				<input type="radio" name="tool" value="obstacle" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<img class="checkmark obstacle" src="../../assets/images/obstacle.png">
+			</label>
+			<label class="tool">
+				<input type="radio" name="tool" value="removal" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<img class="checkmark remove" src="../../assets/images/remove.png">
+			</label>
+		</div>
+	</div>
+	<div #container class="container" (click)="addObject()"></div>
+</div>
+
+<div class="loading" *ngIf="loading"></div>

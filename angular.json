@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ticket-client": {
+    "biocrowds-client": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/",
+            "outputPath": "dist/biocrowds-client",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -62,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ticket-client:build"
+            "browserTarget": "biocrowds-client:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ticket-client:build:production"
+              "browserTarget": "biocrowds-client:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ticket-client:build"
+            "browserTarget": "biocrowds-client:build"
           }
         },
         "test": {
@@ -110,15 +110,15 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "ticket-client:serve"
+            "devServerTarget": "biocrowds-client:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ticket-client:serve:production"
+              "devServerTarget": "biocrowds-client:serve:production"
             }
           }
         }
       }
     }},
-  "defaultProject": "ticket-client"
+  "defaultProject": "biocrowds-client"
 }

@@ -2,11 +2,11 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
-import { GovernmentManagementComponent } from './government-management.component';
+import { BioCrowdsComponent } from './biocrowds.component';
 
-describe('GovernmentManagementComponent', () => {
-	let component: GovernmentManagementComponent;
-	let fixture: ComponentFixture<GovernmentManagementComponent>;
+describe('BioCrowdsComponent', () => {
+	let component: BioCrowdsComponent;
+	let fixture: ComponentFixture<BioCrowdsComponent>;
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
@@ -14,13 +14,13 @@ describe('GovernmentManagementComponent', () => {
 				FormsModule,
         		ReactiveFormsModule
       		],
-			declarations: [GovernmentManagementComponent]
+			declarations: [BioCrowdsComponent]
 		})
 			.compileComponents();
 	}));
 
 	beforeEach(() => {
-		fixture = TestBed.createComponent(GovernmentManagementComponent);
+		fixture = TestBed.createComponent(BioCrowdsComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
 	});

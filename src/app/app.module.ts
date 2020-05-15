@@ -1,17 +1,17 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http'; 
-import { GovernmentManagementService } from './shared/government-management/government-management.service';
+import { BioCrowdsService } from './shared/biocrowds/biocrowds.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { GovernmentManagementComponent } from './government-management/government-management.component';
+import { BioCrowdsComponent } from './biocrowds/biocrowds.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    GovernmentManagementComponent
+    BioCrowdsComponent
   ],
   imports: [
     BrowserModule,
@@ -19,7 +19,7 @@ import { GovernmentManagementComponent } from './government-management/governmen
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [GovernmentManagementService],
-  bootstrap: [AppComponent, GovernmentManagementComponent]
+  providers: [BioCrowdsService],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
