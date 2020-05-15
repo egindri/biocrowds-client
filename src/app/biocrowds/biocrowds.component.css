@@ -121,6 +121,10 @@
 	cursor: crosshair;
 }
 
+.container.removal:hover {
+  cursor: crosshair;
+}
+
 .biocrowds {
   display: grid;
   overflow: hidden;

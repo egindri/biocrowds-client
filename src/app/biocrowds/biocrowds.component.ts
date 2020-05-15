@@ -88,11 +88,8 @@ export class BioCrowdsComponent implements AfterViewInit {
             if (this.delta > 0.05) {
 
                 this.delta = 0;
-                console.log(this.currentPosition);
-                console.log(this.agentPositions.length - 1);
                 if (this.currentPosition === this.agentPositions.length - 1) {
                     this.selectedTool = null;
-                    console.log('yep');
                 } else if (this.currentPosition > 0) {
                     this.currentPosition++;
                 }
@@ -106,7 +103,6 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             switch (this.selectedTool) {
                 case 'agent': {
-                    console.log(this.mousePosition)
                     const agent = new THREE.Mesh(agentGeometry, material);
                     agent.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
 
@@ -133,9 +129,13 @@ export class BioCrowdsComponent implements AfterViewInit {
     addObject() {
         this.dirty = true;
         if (this.selectedTool === 'agent') {
-            this.agentPositions[0].push(this.mousePosition);
+            if (this.agentPositions[0].filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y).length === 0) {
+                this.agentPositions[0].push(this.mousePosition);
+            }
         } else if (this.selectedTool === 'goal') {
             this.goal = this.mousePosition;
+        } else if (this.selectedTool === 'removal') {
+            this.agentPositions[0] = this.agentPositions[0].filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y);
         }
     }
 

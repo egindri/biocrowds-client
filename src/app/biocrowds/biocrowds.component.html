@@ -23,7 +23,7 @@
 			</label>
 		</div>
 	</div>
-	<div #container class="container" (click)="addObject()"></div>
+	<div #container class="container" [ngClass]="{'removal': selectedTool === 'removal'}" (click)="addObject()"></div>
 </div>
 
 <div class="loading" *ngIf="loading"></div>
