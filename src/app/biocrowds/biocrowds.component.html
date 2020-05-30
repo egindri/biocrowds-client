@@ -1,26 +1,42 @@
 <div class="biocrowds">
-	<div class="tools">
-		<div>
+	<div class="left-column">
+		<div class="tools">
 			<label class="tool">
 				<input type="radio" name="tool" value="play" (click)="play()">
 				<img class="checkmark play" src="assets/images/play.png">
 			</label>
 			<label class="tool">
-				<input type="radio" name="tool" value="agent" (change)="handleChange($event)" [ngModel]="selectedTool">
-				<img class="checkmark agent" src="assets/images/person.png">
-			</label>
-			<label class="tool">
-				<input type="radio" name="tool" value="goal" (change)="handleChange($event)" [ngModel]="selectedTool">
-				<img class="checkmark goal" src="assets/images/target.png">
-			</label>
-			<label class="tool">
-				<input type="radio" name="tool" value="obstacle" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<input type="radio" name="tool" value="obstacle" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
 				<img class="checkmark obstacle" src="assets/images/obstacle.png">
 			</label>
 			<label class="tool">
-				<input type="radio" name="tool" value="removal" (change)="handleChange($event)" [ngModel]="selectedTool">
+				<input type="radio" name="tool" value="removal" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
 				<img class="checkmark remove" src="assets/images/remove.png">
 			</label>
+		</div>
+	</div>
+	<div class="right-column">
+		<div class="agents">
+			<div *ngFor="let group of agentPositions[0];let i = index">
+				<div class="agentGroup">
+					<label class="tool">
+						<input type="radio" name="tool" value="agent" (change)="handleChange($event, i)">
+						<img class="checkmark group{{i}}" src="assets/images/person.png">
+					</label>
+				</div>
+				<div class="agentGroup">
+					<label class="tool">
+						<input type="radio" name="tool" value="goal" (change)="handleChange($event, i)">
+						<img class="checkmark group{{i}}" src="assets/images/target.png">
+					</label>
+				</div>
+			</div>
+			<div class="addAgentGroup" *ngIf="agentPositions[0].length < 5">
+				<label class="tool">
+					<input type="radio" name="tool" value="add" (click)="addGroup()" [ngModel]="selectedTool">
+					<img class="checkmark goal" src="assets/images/remove.png">
+				</label>
+			</div>
 		</div>
 	</div>
 	<div #container class="container" [ngClass]="{'removal': selectedTool === 'removal'}" (click)="addObject()"></div>

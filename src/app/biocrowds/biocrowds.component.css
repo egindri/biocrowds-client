@@ -131,17 +131,55 @@
   border-top: 3px solid black;
 }
 
-.tools {
-	grid-area: 1/1;
-	margin-left: 2%;
+.left-column {
+  grid-area: 1/1;
+  margin-left: 2%;
+  margin-top: 2%;
+}
+
+.right-column {
+  grid-area: 1/2;
+  margin-right: 2%;
+  margin-top: 2%;
 }
 
 .container {
-  grid-area: 1/1;
+  grid-area: 1/1/span 2/span 2;
 }
 
-.checkmark.agent {
+.agents {
+  float: right;
+}
+
+.agentGroup {
+  float: left;
+  margin-left: 1em;
+}
+
+.addAgentGroup {
+  float: right;
+  margin-right: 33%;
+  transform: rotate(45deg);
+}
+
+.checkmark.group0 {
   background-color: #aa7aff;
+}
+
+.checkmark.group1 {
+  background-color: #ff73e1;
+}
+
+.checkmark.group2 {
+  background-color: #45f0e0;
+}
+
+.checkmark.group3 {
+  background-color: #abf475;
+}
+
+.checkmark.group4 {
+  background-color: #78a1ff;
 }
 
 .checkmark.obstacle {
@@ -199,7 +237,7 @@
 }
 
 .checkmark.goal {
-  background-color: #3a96ff;
+  background-color: #ffcb3a;
 }
 
 .checkmark:after {
@@ -228,4 +266,8 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.tool input {
+  margin-left: 0px;
 }
