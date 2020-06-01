@@ -17,6 +17,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     agentPositions: THREE.Vector3[][][] = [[[new THREE.Vector3(40, 20, 0), new THREE.Vector3(50, 20, 0)]]];
     goals: [THREE.Vector3] = [new THREE.Vector3(80, 50, 0)];
+    obstacles: any[] = [{a: new THREE.Vector3(50, 50, 0), b: new THREE.Vector3(60, 60, 0)}];
 
     orthographicCamera = true;
     playing = false;
@@ -32,6 +33,10 @@ export class BioCrowdsComponent implements AfterViewInit {
     selectedTool: string;
     mousePosition = new THREE.Vector3(0, 0, 0);
 
+    currentPoint = new THREE.Vector3(-1, -1, -1);
+
+    obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
+
     constructor(private bioCrowdsService: BioCrowdsService) {}
 
     ngAfterViewInit() {
@@ -46,7 +51,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         this.container.nativeElement.appendChild(renderer.domElement);
 
-        const agentGeometry = new THREE.SphereGeometry(5);
+        const sphereGeometry = new THREE.SphereGeometry(5);
 
         const clock = new THREE.Clock();
         const animate = () => {
@@ -72,7 +77,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                 camera.position.z = 15;
             }
 
-            console.log(this.agentPositions)
+            this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
 
             this.agentPositions[this.currentPosition].forEach((g, i) => {
 
@@ -93,12 +98,12 @@ export class BioCrowdsComponent implements AfterViewInit {
                     if (!nextAgentPosition) {
                         nextAgentPosition = a;
                     }
-                    const agent = new THREE.Mesh(agentGeometry, materials[i]);
-                    agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 20) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 20) * 10, a.z * nextAgentPosition.z * this.delta * 0.5);
+                    const agent = new THREE.Mesh(sphereGeometry, materials[i]);
+                    agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, a.z * nextAgentPosition.z * this.delta * 20);
                     scene.add(agent);
             })});
 
-            if (this.delta > 0.05) {
+            if (this.delta > 0.1) {
 
                 this.delta = 0;
                 if (this.currentPosition === this.agentPositions.length - 1) {
@@ -110,12 +115,23 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             switch (this.selectedTool) {
                 case 'agent': {
-                    const agent = new THREE.Mesh(agentGeometry, materials[this.groupIndex]);
+                    const agent = new THREE.Mesh(sphereGeometry, materials[this.groupIndex]);
                     agent.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
 
                     scene.add(agent);
-                    console.log('y');
                     break;
+                }
+                case 'obstacle': {
+                    const point = new THREE.Mesh(sphereGeometry, this.obstacleMaterial);
+                    if (this.currentPoint.x < 0) {
+                        point.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+
+                        scene.add(point);
+                    } else {
+                        this.printLine(this.currentPoint, this.mousePosition, scene);
+                    }
+                    break;
+
                 }
                 default: {
 
@@ -134,6 +150,29 @@ export class BioCrowdsComponent implements AfterViewInit {
         this.mousePosition = this.obtainMousePosition(event);
     }
 
+    printLine(a: THREE.Vector3, b: THREE.Vector3, scene: THREE.Scene) {
+
+        for (let i = -5; i < 5; i++) {
+            const pointsX = [];
+            const pointsY = [];
+            const x = Math.abs(this.currentPoint.x - this.mousePosition.x);
+            const y = Math.abs(this.currentPoint.y - this.mousePosition.y);
+            pointsX.push( new THREE.Vector3(a.x * 10, a.y * 10+i, -10 ) );
+            pointsX.push( new THREE.Vector3(b.x * 10, b.y * 10+i, -10 ) );
+            pointsY.push( new THREE.Vector3(a.x * 10 + i, a.y * 10, -10 ) );
+            pointsY.push( new THREE.Vector3(b.x * 10 + i, b.y * 10, -10 ) );
+
+            const geometryX = new THREE.BufferGeometry().setFromPoints( pointsX );
+            const lineX = new THREE.Line( geometryX, this.obstacleMaterial );
+
+            const geometryY = new THREE.BufferGeometry().setFromPoints( pointsY );
+            const lineY = new THREE.Line( geometryY, this.obstacleMaterial );
+
+            scene.add( lineX );
+            scene.add( lineY );
+        }
+    }
+
     addObject() {
         this.dirty = true;
         if (this.selectedTool === 'agent') {
@@ -144,8 +183,31 @@ export class BioCrowdsComponent implements AfterViewInit {
             this.goals[this.groupIndex] = this.mousePosition;
         } else if (this.selectedTool === 'removal') {
             this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
+            this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
+        } else if (this.selectedTool === 'obstacle') {
+            if (this.currentPoint.x >= 0) {
+                this.obstacles.push({a: this.currentPoint, b: this.mousePosition})
+                this.currentPoint = new THREE.Vector3(-1, -1, -1);
+            } else {
+                this.currentPoint = this.mousePosition;
+            }
         }
     }
+
+    isPointOnLine (pointA, pointB, pointToCheck) {
+    var c = new THREE.Vector3();   
+    c.crossVectors(pointA.clone().sub(pointToCheck), pointB.clone().sub(pointToCheck));
+    return !c.length(); }
+
+    isPointOnLineAndBetweenPoints(pointA, pointB, pointToCheck) {
+    if (!this.isPointOnLine(pointA, pointB, pointToCheck)) {
+        return false;
+    }
+
+    let d = pointA.distanceTo(pointB);
+
+    return pointA.distanceTo(pointToCheck) < d && pointB.distanceTo(pointToCheck) < d;
+}
 
     obtainMousePosition(event: MouseEvent) {
         let x: number;
@@ -169,6 +231,7 @@ export class BioCrowdsComponent implements AfterViewInit {
             this.loading = true;
             const world: any = {};
             world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
+            world.obstacles = this.obstacles;
             world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
             this.bioCrowdsService.simulate(world, 200).subscribe(
