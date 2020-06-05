@@ -261,16 +261,15 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         this.bioCrowdsService.save(world).subscribe(
                                                     res => {
-                                                        this.agentPositions = res.positions;
-                                                        this.currentPosition = 1;
+                                                        this.currentPosition = 0;
                                                         this.loading = false;
                                                         this.dirty = false;
                                                         this.delta = 0;
-                                                        this.location.replaceState('/edit');
-
+                                                        this.location.replaceState(res.headers.get('location').split('/').slice(-1)[0]);
+                                                        console.log(res)
+                                                        
                                                     },
                                                     error => {
-                                                        this.location.replaceState('/edit');
                                                         alert(error.error.message);
                                                         this.loading = false;
                                                         });
