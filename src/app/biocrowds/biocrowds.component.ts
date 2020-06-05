@@ -1,4 +1,5 @@
 import {Component, ViewChild, ElementRef, AfterViewInit, HostListener} from '@angular/core';
+import { Location } from '@angular/common';
 import * as THREE from 'three';
 import { BioCrowdsService } from '../shared/biocrowds/biocrowds.service';
 import { Tool } from './tool';
@@ -39,7 +40,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
-    constructor(private bioCrowdsService: BioCrowdsService) {}
+    constructor(private bioCrowdsService: BioCrowdsService, private location: Location) {}
 
     ngAfterViewInit() {
 
@@ -252,6 +253,27 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     save() {
 
+        this.loading = true;
+        const world: any = {};
+        world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
+        world.obstacles = this.obstacles;
+        world.dimensions = new THREE.Vector3(1000, 1000, 1000);
+
+        this.bioCrowdsService.save(world).subscribe(
+                                                    res => {
+                                                        this.agentPositions = res.positions;
+                                                        this.currentPosition = 1;
+                                                        this.loading = false;
+                                                        this.dirty = false;
+                                                        this.delta = 0;
+                                                        this.location.replaceState('/edit');
+
+                                                    },
+                                                    error => {
+                                                        this.location.replaceState('/edit');
+                                                        alert(error.error.message);
+                                                        this.loading = false;
+                                                        });
     }
 
     handleChange(event: Event, index: number) {

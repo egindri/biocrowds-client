@@ -14,4 +14,8 @@ export class BioCrowdsService {
         return this.http.post(environment.apiUrl + 'simulation?numberOfFrames=' + numberOfFrames
                                                  + '&randomPathFactor=' + randomPathFactor, world);
     }
+
+    save(world: any): Observable<any> {
+        return this.http.post(environment.apiUrl, world);
+    }
 }
