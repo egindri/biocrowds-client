@@ -33,6 +33,8 @@ export class BioCrowdsComponent implements AfterViewInit {
     selectedTool: string;
     mousePosition = new THREE.Vector3(0, 0, 0);
 
+    randomPaths = false;
+
     currentPoint = new THREE.Vector3(-1, -1, -1);
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
@@ -100,6 +102,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                     }
                     const agent = new THREE.Mesh(sphereGeometry, materials[i]);
                     agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, a.z * nextAgentPosition.z * this.delta * 20);
+                    
                     scene.add(agent);
             })});
 
@@ -194,21 +197,6 @@ export class BioCrowdsComponent implements AfterViewInit {
         }
     }
 
-    isPointOnLine (pointA, pointB, pointToCheck) {
-    var c = new THREE.Vector3();   
-    c.crossVectors(pointA.clone().sub(pointToCheck), pointB.clone().sub(pointToCheck));
-    return !c.length(); }
-
-    isPointOnLineAndBetweenPoints(pointA, pointB, pointToCheck) {
-    if (!this.isPointOnLine(pointA, pointB, pointToCheck)) {
-        return false;
-    }
-
-    let d = pointA.distanceTo(pointB);
-
-    return pointA.distanceTo(pointToCheck) < d && pointB.distanceTo(pointToCheck) < d;
-}
-
     obtainMousePosition(event: MouseEvent) {
         let x: number;
         let y: number;
@@ -234,7 +222,7 @@ export class BioCrowdsComponent implements AfterViewInit {
             world.obstacles = this.obstacles;
             world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
-            this.bioCrowdsService.simulate(world, 200).subscribe(
+            this.bioCrowdsService.simulate(world, 200, this.randomPaths ? 100 : 0).subscribe(
                                                         res => {
                                                             this.agentPositions = res.positions;
                                                             this.currentPosition = 1;
@@ -254,11 +242,15 @@ export class BioCrowdsComponent implements AfterViewInit {
     addGroup() {
         if (this.agentPositions[0].length < 5) {
             this.agentPositions[0].push([]);
-            this.goals.push(new THREE.Vector3(Math.round(Math.random() * (100)), Math.round(Math.random() * (100)), 0));
+            this.goals.push(new THREE.Vector3(Math.round(Math.random() * (100) + 10), Math.round(Math.random() * (100) + 10), 0));
         }
     }
 
     pause() {
+
+    }
+
+    save() {
 
     }
 
@@ -268,5 +260,10 @@ export class BioCrowdsComponent implements AfterViewInit {
         this.selectedTool = element.value;
         this.currentPosition = 0;
         this.groupIndex = index;
+    }
+
+    changeOptions() {
+        this.dirty = true;
+        this.currentPosition = 0;
     }
 }

@@ -1,8 +1,12 @@
 <div class="biocrowds">
-	<div class="left-column">
+	<div class="top-left-column">
 		<div class="tools">
 			<label class="tool">
 				<input type="radio" name="tool" value="play" (click)="play()">
+				<img class="checkmark play" src="assets/images/play.png">
+			</label>
+			<label class="tool">
+				<input type="radio" name="tool" value="save" (click)="save()">
 				<img class="checkmark play" src="assets/images/play.png">
 			</label>
 			<label class="tool">
@@ -12,6 +16,14 @@
 			<label class="tool">
 				<input type="radio" name="tool" value="removal" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
 				<img class="checkmark remove" src="assets/images/remove.png">
+			</label>
+		</div>
+	</div>
+	<div class="bottom-left-column">
+		<div class="tools">
+			<label class="tool">
+				<input type="checkbox" [(ngModel)]="randomPaths" (change)="changeOptions()">
+				<img class="checkmark play" src="assets/images/play.png">
 			</label>
 		</div>
 	</div>

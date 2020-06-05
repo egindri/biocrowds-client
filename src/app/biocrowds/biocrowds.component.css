@@ -131,16 +131,23 @@
   border-top: 3px solid black;
 }
 
-.left-column {
+.top-left-column {
   grid-area: 1/1;
-  margin-left: 2%;
+  margin-left: 3%;
   margin-top: 2%;
+}
+
+.bottom-left-column {
+  margin-left: 2%;
+  grid-area: 2/1;
+  position: absolute;
+  bottom: 3%;
 }
 
 .right-column {
   grid-area: 1/2;
-  margin-right: 2%;
-  margin-top: 2%;
+  margin-right: 3%;
+  margin-top: 3%;
 }
 
 .container {

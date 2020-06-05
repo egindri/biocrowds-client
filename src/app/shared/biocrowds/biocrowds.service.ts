@@ -10,7 +10,8 @@ export class BioCrowdsService {
 
     constructor(private http: HttpClient) {}
 
-    simulate(world: any, numberOfFrames: number): Observable<any> {
-        return this.http.post(environment.apiUrl + 'simulation?numberOfFrames=' + numberOfFrames, world);
+    simulate(world: any, numberOfFrames: number, randomPathFactor: number): Observable<any> {
+        return this.http.post(environment.apiUrl + 'simulation?numberOfFrames=' + numberOfFrames
+                                                 + '&randomPathFactor=' + randomPathFactor, world);
     }
 }
