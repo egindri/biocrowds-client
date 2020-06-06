@@ -267,7 +267,6 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                         this.delta = 0;
                                                         this.location.replaceState(res.headers.get('location').split('/').slice(-1)[0]);
                                                         console.log(res)
-                                                        
                                                     },
                                                     error => {
                                                         alert(error.error.message);
