@@ -7,7 +7,7 @@
 			</label>
 			<label class="tool">
 				<input type="radio" name="tool" value="save" (click)="save()">
-				<img class="checkmark play" src="assets/images/play.png">
+				<img class="checkmark save" src="assets/images/save.png">
 			</label>
 			<label class="tool">
 				<input type="radio" name="tool" value="obstacle" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
@@ -23,7 +23,7 @@
 		<div class="tools">
 			<label class="tool">
 				<input type="checkbox" [(ngModel)]="randomPaths" (change)="changeOptions()">
-				<img class="checkmark play" src="assets/images/play.png">
+				<img class="checkmark random" src="assets/images/random.png">
 			</label>
 		</div>
 	</div>

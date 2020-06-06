@@ -1,5 +1,6 @@
 import {Component, ViewChild, ElementRef, AfterViewInit, HostListener} from '@angular/core';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import * as THREE from 'three';
 import { BioCrowdsService } from '../shared/biocrowds/biocrowds.service';
 import { Tool } from './tool';
@@ -40,7 +41,9 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
-    constructor(private bioCrowdsService: BioCrowdsService, private location: Location) {}
+    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, private router: Router) {
+        console.log(router.url)
+    }
 
     ngAfterViewInit() {
 
