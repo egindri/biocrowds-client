@@ -1,6 +1,5 @@
 import {Component, ViewChild, ElementRef, AfterViewInit, HostListener} from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
 import * as THREE from 'three';
 import { BioCrowdsService } from '../shared/biocrowds/biocrowds.service';
 import { Tool } from './tool';
@@ -41,11 +40,26 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
-    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, private router: Router) {
-        console.log(router.url)
-    }
+    constructor(private bioCrowdsService: BioCrowdsService, private location: Location) {}
 
     ngAfterViewInit() {
+
+        const id = window.location.pathname.replace('/', '');
+
+        if (id) {
+            console.log('yeppers')
+            this.bioCrowdsService.find(id).subscribe(
+                                                    res => {
+                                                        console.log(res)
+                                                        this.agentPositions[0] = res.agentGroups.map(ag => ag.agentInitialPositions);
+                                                        this.goals = res.agentGroups.map(ag => ag.goal);
+                                                        this.obstacles = res.obstacles;
+                                                    },
+                                                    error => {
+
+                                                    }
+            )
+        }
 
         const renderer = new THREE.WebGLRenderer();
 

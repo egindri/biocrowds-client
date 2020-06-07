@@ -18,4 +18,8 @@ export class BioCrowdsService {
     save(world: any): Observable<any> {
         return this.http.post(environment.apiUrl, world, {observe: 'response'});
     }
+
+    find(id: string): Observable<any> {
+        return this.http.get(environment.apiUrl + id);
+    }
 }
