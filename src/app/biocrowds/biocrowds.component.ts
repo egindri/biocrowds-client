@@ -57,7 +57,7 @@ export class BioCrowdsComponent implements AfterViewInit {
             this.bioCrowdsService.find(id).subscribe(
                                                     res => {
                                                         console.log(res)
-                                                        this.frames[0] = res.agentGroups.map(ag => ag.agentInitialPositions);
+                                                        this.agentPositions[0] = res.agentGroups.map(ag => ag.agentInitialPositions);
                                                         this.goals = res.agentGroups.map(ag => ag.goal);
                                                         this.obstacles = res.obstacles;
                                                     },
@@ -104,7 +104,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
 
-            this.frames[this.currentPosition].forEach((g, i) => {
+            this.agentPositions[this.currentPosition].forEach((g, i) => {
 
                 const geometry = new THREE.BoxGeometry(30, 30, 1);
                 const goal = new THREE.Mesh(geometry, materials[i]);
@@ -157,7 +157,7 @@ export class BioCrowdsComponent implements AfterViewInit {
             if (this.delta > 0.1) {
 
                 this.delta = 0;
-                if (this.currentPosition === this.frames.length - 1) {
+                if (this.currentPosition === this.agentPositions.length - 1) {
                     this.selectedTool = null;
                 } else if (this.currentPosition > 0) {
                     this.currentPosition++;
@@ -227,13 +227,13 @@ export class BioCrowdsComponent implements AfterViewInit {
     addObject() {
         this.dirty = true;
         if (this.selectedTool === 'agent') {
-            if (this.frames[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
-                this.frames[0][this.groupIndex].push(this.mousePosition);
+            if (this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
+                this.agentPositions[0][this.groupIndex].push(this.mousePosition);
             }
         } else if (this.selectedTool === 'goal') {
             this.goals[this.groupIndex] = this.mousePosition;
         } else if (this.selectedTool === 'removal') {
-            this.frames[0] = this.frames[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
+            this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
             this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
         } else if (this.selectedTool === 'obstacle') {
             if (this.currentPoint.x >= 0) {
@@ -270,13 +270,13 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             this.loading = true;
             const world: any = {};
-            world.agentGroups = this.frames[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
+            world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
             world.obstacles = this.obstacles;
             world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
             this.bioCrowdsService.simulate(world, 200, this.randomPaths ? 100 : 0).subscribe(
                                                         res => {
-                                                            this.frames = res.positions;
+                                                            this.agentPositions = res.positions;
                                                             this.currentPosition = 1;
                                                             this.loading = false;
                                                             this.dirty = false;
@@ -294,8 +294,8 @@ export class BioCrowdsComponent implements AfterViewInit {
     }
 
     addGroup() {
-        if (this.frames[0].length < 5) {
-            this.frames[0].push([]);
+        if (this.agentPositions[0].length < 5) {
+            this.agentPositions[0].push([]);
             this.goals.push(new THREE.Vector3(Math.round(Math.random() * (100) + 10), Math.round(Math.random() * (100) + 10), 0));
         }
     }
@@ -308,7 +308,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         this.loading = true;
         const world: any = {};
-        world.agentGroups = this.frames[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
+        world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
         world.obstacles = this.obstacles;
         world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
