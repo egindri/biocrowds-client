@@ -27,7 +27,7 @@
 			</label>
 		</div>
 	</div>
-	<div class="right-column">
+	<div class="top-right-column">
 		<div class="agents">
 			<div *ngFor="let group of agentPositions[0];let i = index">
 				<div class="agentGroup">
@@ -48,6 +48,31 @@
 					<input type="radio" name="tool" value="add" (click)="addGroup()" [ngModel]="selectedTool">
 					<img class="checkmark goal" src="assets/images/remove.png">
 				</label>
+			</div>
+		</div>
+	</div>
+	<div class="bottom-right-column">
+		<div class="infos">
+			<div class="agentInfo">
+				<div class="info">
+					&Tau;&nbsp; {{ (responseTime | number:'1.2-2') + 's'}}
+				</div>
+				<div class="info">
+					&Delta;t {{' ' + (currentPosition > 0 ? (clock.getElapsedTime() | number:'1.2-2') : 0) + ' s' }}
+				</div>
+			</div>
+			<div class="agentInfo">
+				<div *ngFor="let info of infos; let i = index">
+					<div class="info group{{i}}">
+						 {{'v&#773;&nbsp;&nbsp;&nbsp;' + ((info.currentSpeed | number:'1.2-2')) + ' m/s'}}
+					</div>
+					<div class="info group{{i}}">
+						&Delta; {{'&nbsp;&nbsp;' + ((info.totalDistance | number:'1.2-2')) + ' m'}}
+					</div>
+					<div class="info group{{i}}">
+						&Delta;&#773; {{'&nbsp;&nbsp;' + ((info.averageDistance | number:'1.2-2')) + ' m'}}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

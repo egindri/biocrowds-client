@@ -128,6 +128,7 @@
 .biocrowds {
   display: grid;
   overflow: hidden;
+  grid-template-rows: 1fr 1fr;
   border-top: 3px solid black;
 }
 
@@ -144,10 +145,15 @@
   bottom: 3%;
 }
 
-.right-column {
+.top-right-column {
   grid-area: 1/2;
   margin-right: 3%;
   margin-top: 3%;
+}
+
+.bottom-right-column {
+  margin-right: 1%;
+  grid-area: 2/2;
 }
 
 .container {
@@ -169,6 +175,22 @@
   transform: rotate(45deg);
 }
 
+.agentInfo {
+  float: none;
+}
+
+.infos {
+  font-family: Cambria Math;
+  float: right;
+  margin-right: 3%;
+  margin-top: -10%;
+}
+
+.info {
+  position: relative;
+  font-size: 22px;
+}
+
 .checkmark.group0 {
   background-color: #aa7aff;
 }
@@ -187,6 +209,26 @@
 
 .checkmark.group4 {
   background-color: #ffcb3a;
+}
+
+.group0 {
+  color: #aa7aff;
+}
+
+.group1 {
+  color: #ff73e1;
+}
+
+.group2 {
+  color: #45f0e0;
+}
+
+.group3 {
+  color: #abf475;
+}
+
+.group4 {
+  color: #ffcb3a;
 }
 
 .checkmark.obstacle {
@@ -248,7 +290,7 @@
 }
 
 .tool input:checked ~ .checkmark {
-  background-color: #111;
+  background-color: rgb(58, 58, 58);
 }
 
 .checkmark.goal {

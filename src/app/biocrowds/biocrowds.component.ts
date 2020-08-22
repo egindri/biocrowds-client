@@ -2,7 +2,7 @@ import {Component, ViewChild, ElementRef, AfterViewInit, HostListener} from '@an
 import { Location } from '@angular/common';
 import * as THREE from 'three';
 import { BioCrowdsService } from '../shared/biocrowds/biocrowds.service';
-import { Tool } from './tool';
+import { Info } from './info';
 
 @Component({
     selector: 'app-biocrowds',
@@ -19,6 +19,7 @@ export class BioCrowdsComponent implements AfterViewInit {
     agentPositions: THREE.Vector3[][][] = [[[new THREE.Vector3(40, 20, 0), new THREE.Vector3(50, 20, 0)]]];
     goals: [THREE.Vector3] = [new THREE.Vector3(80, 50, 0)];
     obstacles: any[] = [{a: new THREE.Vector3(50, 50, 0), b: new THREE.Vector3(60, 60, 0)}];
+	infos: Info[] = [];
 
     orthographicCamera = true;
     playing = false;
@@ -28,6 +29,10 @@ export class BioCrowdsComponent implements AfterViewInit {
     currentPosition = 0;
     delta = 0;
     fps = 20;
+
+	responseTime = 0;
+
+	clock = new THREE.Clock();
 
     groupIndex = 0;
 
@@ -73,11 +78,10 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         const sphereGeometry = new THREE.SphereGeometry(5);
 
-        const clock = new THREE.Clock();
         const animate = () => {
             requestAnimationFrame(animate);
 
-            this.delta += this.currentPosition > 0 ? clock.getDelta() : 0;
+            this.delta += this.currentPosition > 0 ? this.clock.getDelta() : 0;
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0xEEEEEE);
@@ -107,8 +111,15 @@ export class BioCrowdsComponent implements AfterViewInit {
                 goal.rotation.set(0, 0, 1.5707 / 2);
                 scene.add(goal);
 
+				this.infos[i] = new Info();
+				this.infos[i].currentSpeed = 0;
+				this.infos[i].averageSpeed = 0;
+				this.infos[i].totalDistance = 0;
+				this.infos[i].averageDistance = 0;
+
                 g.forEach((a, j) => {
-                    const nextPosition = this.agentPositions[this.currentPosition + 1];
+                    
+					const nextPosition = this.agentPositions[this.currentPosition + 1];
 
                     let nextAgentPosition: THREE.Vector3;
                     if (nextPosition && nextPosition[i]) {
@@ -118,11 +129,29 @@ export class BioCrowdsComponent implements AfterViewInit {
                     if (!nextAgentPosition) {
                         nextAgentPosition = a;
                     }
+					
+					this.infos[i].totalDistance += Math.sqrt(Math.pow(a.x - this.agentPositions[0][i][j].x, 2)
+										+ Math.pow(a.y - this.agentPositions[0][i][j].y, 2) 
+										+ Math.pow(a.z - this.agentPositions[0][i][j].z, 2));
+					
+					this.infos[i].averageDistance += Math.sqrt(Math.pow(a.x - this.agentPositions[0][i][j].x, 2)
+										+ Math.pow(a.y - this.agentPositions[0][i][j].y, 2) 
+										+ Math.pow(a.z - this.agentPositions[0][i][j].z, 2))/ g.length;
+										
+					this.infos[i].currentSpeed += Math.sqrt(Math.pow((nextAgentPosition.x - a.x) / g.length, 2)
+										+ Math.pow((nextAgentPosition.y - a.y) / g.length, 2) 
+										+ Math.pow((nextAgentPosition.z - a.z) / g.length, 2));
+										
+					this.infos[i].averageSpeed += Math.sqrt(Math.pow((a.x - this.agentPositions[0][i][j].x) / g.length, 2)
+										+ Math.pow((a.y - this.agentPositions[0][i][j].y) / g.length, 2) 
+										+ Math.pow((a.z - this.agentPositions[0][i][j].z) / g.length, 2));
+					
                     const agent = new THREE.Mesh(sphereGeometry, materials[i]);
                     agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, a.z * nextAgentPosition.z * this.delta * 20);
                     
                     scene.add(agent);
-            })});
+            	});
+			});
 
             if (this.delta > 0.1) {
 
@@ -232,7 +261,11 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     play() {
         this.selectedTool = null;
+		this.clock = new THREE.Clock();
+		this.clock.start();
         if (this.dirty) {
+	
+			this.responseTime = 0;
 
             this.loading = true;
             const world: any = {};
@@ -247,6 +280,8 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                             this.loading = false;
                                                             this.dirty = false;
                                                             this.delta = 0;
+															this.responseTime = this.clock.getElapsedTime();
+															console.log(this.clock.getElapsedTime());
                                                         },
                                                         error => {
                                                             alert(error.error.message);
