@@ -119,12 +119,8 @@ export class BioCrowdsComponent implements AfterViewInit {
 				this.infos[i].averageDistance = 0;
 
                 g.forEach((a, j) => {
-<<<<<<< Updated upstream
                     
 					const nextPosition = this.agentPositions[this.currentPosition + 1];
-=======
-                    const nextPosition = this.frames[this.currentPosition + 1];
->>>>>>> Stashed changes
 
                     let nextAgentPosition: THREE.Vector3;
                     if (nextPosition && nextPosition[i]) {
