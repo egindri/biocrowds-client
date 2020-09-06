@@ -20,7 +20,7 @@ export class BioCrowdsComponent implements AfterViewInit {
     agentPositions = [[[new THREE.Vector3(40, 20, 0), new THREE.Vector3(50, 20, 0)]]];
     goals: [THREE.Vector3] = [new THREE.Vector3(80, 50, 0)];
     obstacles: any[] = [{a: new THREE.Vector3(50, 50, 0), b: new THREE.Vector3(60, 60, 0)}];
-	paths = [];
+	paths: THREE.Vector3[][] = [];
 	newPath = [];
 	infos: Info[] = [];
 
@@ -59,7 +59,6 @@ export class BioCrowdsComponent implements AfterViewInit {
         const id = window.location.pathname.replace(this.baseHref, '');
 
         if (id) {
-            console.log('yeppers')
             this.bioCrowdsService.find(id).subscribe(
                                                     res => {
                                                         console.log(res)
@@ -110,12 +109,23 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
 
+			this.paths.forEach((p, i) => {
+				p.forEach(v => {
+					const geometry = new THREE.BoxGeometry(8, 8, 1);
+                	const point = new THREE.Mesh(geometry, materials[i]);
+						
+					point.position.set(v.x * 10, v.y * 10, -5);
+					point.rotation.set(0, 0, 1.5707 / 2);
+					console.log('y')
+	                scene.add(point);
+				});
+			});
+
             this.agentPositions[this.currentPosition].forEach((g, i) => {
 
-                const geometry = new THREE.BoxGeometry(30, 30, 1);
+                const geometry = new THREE.RingGeometry(20, 8, 20);
                 const goal = new THREE.Mesh(geometry, materials[i]);
                 goal.position.set(this.goals[i].x * 10, this.goals[i].y * 10, -5);
-                goal.rotation.set(0, 0, 1.5707 / 2);
                 scene.add(goal);
 
 				this.infos[i] = new Info();
@@ -191,13 +201,22 @@ export class BioCrowdsComponent implements AfterViewInit {
 
                 }
 				case 'prediction': {
-                    const prediction = new THREE.Mesh(sphereGeometry, materials[this.groupIndex]);
-                    prediction.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+					const geometry = new THREE.BoxGeometry(8, 8, 1);
+                    const point = new THREE.Mesh(geometry, materials[this.groupIndex]);
+                    point.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+					point.rotation.set(0, 0, 1.5707 / 2);
 
-                    scene.add(prediction);
+                    scene.add(point);
 
 					if (this.clicking) {
-						console.log('y')
+	
+						if (!this.paths[this.groupIndex]) {
+							this.paths[this.groupIndex] = [];
+						}					
+						
+						if (this.paths.flat().filter(a => a.x == this.mousePosition.x && a.y == this.mousePosition.y).length === 0) {
+							this.paths[this.groupIndex].push(new THREE.Vector3(this.mousePosition.x, this.mousePosition.y, 0));
+						}
 					}
 
                     break;
@@ -266,6 +285,15 @@ export class BioCrowdsComponent implements AfterViewInit {
         } else if (this.selectedTool === 'removal') {
             this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
             this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
+			
+			this.paths.forEach((p, i) => {
+				p.forEach(v => {
+					if (v.x === this.mousePosition.x && v.y === this.mousePosition.y) {
+						this.paths[i] = [];	
+					}	
+				});			
+			});
+			
         } else if (this.selectedTool === 'obstacle') {
             if (this.currentPoint.x >= 0) {
                 this.obstacles.push({a: this.currentPoint, b: this.mousePosition})
