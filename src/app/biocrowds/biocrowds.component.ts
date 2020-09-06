@@ -20,6 +20,8 @@ export class BioCrowdsComponent implements AfterViewInit {
     agentPositions = [[[new THREE.Vector3(40, 20, 0), new THREE.Vector3(50, 20, 0)]]];
     goals: [THREE.Vector3] = [new THREE.Vector3(80, 50, 0)];
     obstacles: any[] = [{a: new THREE.Vector3(50, 50, 0), b: new THREE.Vector3(60, 60, 0)}];
+	paths = [];
+	newPath = [];
 	infos: Info[] = [];
 
     orthographicCamera = true;
@@ -37,6 +39,8 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     groupIndex = 0;
 
+	clicking = false;
+
     selectedTool: string;
     mousePosition = new THREE.Vector3(0, 0, 0);
 
@@ -46,7 +50,9 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
-    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {}
+    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {
+	
+}
 
     ngAfterViewInit() {
 
@@ -184,6 +190,18 @@ export class BioCrowdsComponent implements AfterViewInit {
                     break;
 
                 }
+				case 'prediction': {
+                    const prediction = new THREE.Mesh(sphereGeometry, materials[this.groupIndex]);
+                    prediction.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+
+                    scene.add(prediction);
+
+					if (this.clicking) {
+						console.log('y')
+					}
+
+                    break;
+				}
                 default: {
 
                 }
@@ -199,6 +217,18 @@ export class BioCrowdsComponent implements AfterViewInit {
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent) {
         this.mousePosition = this.obtainMousePosition(event);
+    }
+
+    @HostListener('document:touchstart', ['$event'])
+    @HostListener('document:pointerdown', ['$event'])
+    onMouseDown() {
+		this.clicking = true;
+    }
+
+    @HostListener('document:touchend', ['$event'])
+    @HostListener('document:pointerup', ['$event'])
+    onMouseUp() {
+		this.clicking = false;
     }
 
     printLine(a: THREE.Vector3, b: THREE.Vector3, scene: THREE.Scene) {
@@ -226,6 +256,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     addObject() {
         this.dirty = true;
+		
         if (this.selectedTool === 'agent') {
             if (this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
                 this.agentPositions[0][this.groupIndex].push(this.mousePosition);

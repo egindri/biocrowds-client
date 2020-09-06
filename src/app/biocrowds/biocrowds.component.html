@@ -42,6 +42,12 @@
 						<img class="checkmark group{{i}}" src="assets/images/target.png">
 					</label>
 				</div>
+				<div class="agentGroup">
+					<label class="tool">
+						<input type="radio" name="tool" value="prediction" (change)="handleChange($event, i)">
+						<img class="checkmark group{{i}}" src="assets/images/target.png">
+					</label>
+				</div>
 			</div>
 			<div class="addAgentGroup" *ngIf="agentPositions[0].length < 5">
 				<label class="tool">
@@ -76,7 +82,7 @@
 			</div>
 		</div>
 	</div>
-	<div #container class="container" [ngClass]="{'removal': selectedTool === 'removal'}" (click)="addObject()"></div>
+	<div #container class="container" [ngClass]="{'removal': selectedTool === 'removal'}" (click)="addObject()" ></div>
 </div>
 
 <div class="loading" *ngIf="loading"></div>
