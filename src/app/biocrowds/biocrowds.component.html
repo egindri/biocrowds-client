@@ -64,7 +64,7 @@
 					&Tau;&nbsp; {{ (responseTime | number:'1.2-2') + 's'}}
 				</div>
 				<div class="info">
-					&Delta;t {{' ' + (currentPosition > 0 ? (clock.getElapsedTime() | number:'1.2-2') : 0) + ' s' }}
+					&Delta;t {{' ' + (elapsedTime | number:'1.2-2') + ' s' }}
 				</div>
 			</div>
 			<div class="agentInfo">
@@ -77,6 +77,9 @@
 					</div>
 					<div class="info group{{i}}">
 						&Delta;&#773; {{'&nbsp;&nbsp;' + ((info.averageDistance | number:'1.2-2')) + ' m'}}
+					</div>
+					<div class="info group{{i}}">
+						&Delta;&#773; {{'&nbsp;&nbsp;' + ((info.averageDivergence | number:'1.2-2')) + ' m'}}
 					</div>
 				</div>
 			</div>

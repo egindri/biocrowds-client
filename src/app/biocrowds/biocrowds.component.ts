@@ -50,6 +50,8 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
+	elapsedTime = 0;
+
     constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {
 	
 }
@@ -107,6 +109,9 @@ export class BioCrowdsComponent implements AfterViewInit {
                 camera.position.z = 15;
             }
 
+
+			this.elapsedTime = this.currentPosition > 0 ? this.clock.getElapsedTime() : 0
+
             this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
 
 			this.paths.forEach((p, i) => {
@@ -116,7 +121,6 @@ export class BioCrowdsComponent implements AfterViewInit {
 						
 					point.position.set(v.x * 10, v.y * 10, -5);
 					point.rotation.set(0, 0, 1.5707 / 2);
-					console.log('y')
 	                scene.add(point);
 				});
 			});
@@ -133,6 +137,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 				this.infos[i].averageSpeed = 0;
 				this.infos[i].totalDistance = 0;
 				this.infos[i].averageDistance = 0;
+				this.infos[i].averageDivergence = 0;
 
                 g.forEach((a, j) => {
                     
@@ -162,6 +167,15 @@ export class BioCrowdsComponent implements AfterViewInit {
 					this.infos[i].averageSpeed += Math.sqrt(Math.pow((a.x - this.agentPositions[0][i][j].x) / g.length, 2)
 										+ Math.pow((a.y - this.agentPositions[0][i][j].y) / g.length, 2) 
 										+ Math.pow((a.z - this.agentPositions[0][i][j].z) / g.length, 2));
+					
+					if (this.paths[i]) {
+						this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => 
+						Math.sqrt(Math.pow((a.x -  p.x)/ g.length, 2)
+											+ Math.pow((a.y -  p.y)/ g.length, 2) 
+											+ Math.pow((a.z -  p.z)/ g.length, 2))
+						
+						));
+					}
 					
                     const agent = new THREE.Mesh(sphereGeometry, materials[i]);
                     agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, a.z * nextAgentPosition.z * this.delta * 20);
@@ -341,7 +355,6 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                             this.dirty = false;
                                                             this.delta = 0;
 															this.responseTime = this.clock.getElapsedTime();
-															console.log(this.clock.getElapsedTime());
                                                         },
                                                         error => {
                                                             alert(error.error.message);

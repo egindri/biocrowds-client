@@ -3,4 +3,5 @@ export class Info {
     averageSpeed: number;
 	totalDistance: number;
 	averageDistance: number;
+	averageDivergence: number;
 }
