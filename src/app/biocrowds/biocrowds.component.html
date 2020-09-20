@@ -45,7 +45,7 @@
 				<div class="agentGroup">
 					<label class="tool">
 						<input type="radio" name="tool" value="prediction" (change)="handleChange($event, i)">
-						<img class="checkmark group{{i}}" src="assets/images/target.png">
+						<img class="checkmark group{{i}}" src="assets/images/curved-arrow.png">
 					</label>
 				</div>
 			</div>
@@ -73,13 +73,13 @@
 						 {{'v&#773;&nbsp;&nbsp;&nbsp;' + ((info.currentSpeed | number:'1.2-2')) + ' m/s'}}
 					</div>
 					<div class="info group{{i}}">
-						&Delta; {{'&nbsp;&nbsp;' + ((info.totalDistance | number:'1.2-2')) + ' m'}}
+						s {{'&nbsp;&nbsp;' + ((info.totalDistance | number:'1.2-2')) + ' m'}}
 					</div>
 					<div class="info group{{i}}">
-						&Delta;&#773; {{'&nbsp;&nbsp;' + ((info.averageDistance | number:'1.2-2')) + ' m'}}
+						s&#773; {{'&nbsp;&nbsp;' + ((info.averageDistance | number:'1.2-2')) + ' m'}}
 					</div>
 					<div class="info group{{i}}">
-						&Delta;&#773; {{'&nbsp;&nbsp;' + ((info.averageDivergence | number:'1.2-2')) + ' m'}}
+						d&#773; {{'&nbsp;&nbsp;' + ((info.averageDivergence | number:'1.2-2')) + ' m'}}
 					</div>
 				</div>
 			</div>
