@@ -1,7 +1,8 @@
 export class Info {
-    currentSpeed: number;
-    averageSpeed: number;
-	totalDistance: number;
-	averageDistance: number;
-	averageDivergence: number;
+    
+	currentSpeed = 0;
+    averageSpeed = 0;
+	totalDistance = 0;
+	averageDistance = 0;
+	averageDivergence = 0;
 }

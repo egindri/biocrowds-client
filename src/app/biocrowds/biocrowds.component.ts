@@ -52,9 +52,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
 	elapsedTime = 0;
 
-    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {
-	
-}
+    constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {}
 
     ngAfterViewInit() {
 
@@ -67,9 +65,6 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                         this.agentPositions[0] = res.agentGroups.map(ag => ag.agentInitialPositions);
                                                         this.goals = res.agentGroups.map(ag => ag.goal);
                                                         this.obstacles = res.obstacles;
-                                                    },
-                                                    error => {
-
                                                     }
             )
         }
@@ -109,7 +104,6 @@ export class BioCrowdsComponent implements AfterViewInit {
                 camera.position.z = 15;
             }
 
-
 			this.elapsedTime = this.currentPosition > 0 ? this.clock.getElapsedTime() : 0
 
             this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
@@ -133,11 +127,6 @@ export class BioCrowdsComponent implements AfterViewInit {
                 scene.add(goal);
 
 				this.infos[i] = new Info();
-				this.infos[i].currentSpeed = 0;
-				this.infos[i].averageSpeed = 0;
-				this.infos[i].totalDistance = 0;
-				this.infos[i].averageDistance = 0;
-				this.infos[i].averageDivergence = 0;
 
                 g.forEach((a, j) => {
                     
