@@ -21,7 +21,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                	new THREE.MeshBasicMaterial({color: 0x78a1ff})];
 
     sphereGeometry = new THREE.SphereGeometry(5);
-	ringGeometry = new THREE.RingGeometry(20, 4, 20);
+	ringGeometry = new THREE.RingGeometry(20, 3, 20);
 
     canvasWidth: number;
     canvasHeight: number;
@@ -65,7 +65,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     ngAfterViewInit() {
 
-        const id = window.location.pathname.replace(this.baseHref, '');
+        const id = window.location.hash.replace('#/', '');
 
         if (id) {
             this.bioCrowdsService.find(id).subscribe(res => {
@@ -263,15 +263,18 @@ export class BioCrowdsComponent implements AfterViewInit {
 										  .reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
 	            	this.agentPositions[0][this.groupIndex].push(this.mousePosition);
 				}
+				break;
 			}
 			case 'goal': {
             	this.goals[this.groupIndex] = this.mousePosition;
+				break;
         	} 
 			case 'removal': {
 	            this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
 	            this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
 				
 				this.paths.forEach((p, i) => p.filter(v => v.x === this.mousePosition.x && v.y === this.mousePosition.y).forEach(_v => this.paths[i] = []));
+				break;
         	} 
 			case 'obstacle': {
 	            if (this.currentPoint.x >= 0) {
@@ -344,7 +347,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                         this.loading = false;
                                                         this.dirty = false;
                                                         this.delta = 0;
-                                                        this.location.replaceState(this.baseHref + res.headers.get('location').split('/').slice(-1)[0]);
+                                                        this.location.replaceState(this.baseHref + '#/' + res.headers.get('location').split('/').slice(-1)[0]);
                                                     },
                                                     error => {
                                                         alert(error.error.message);
