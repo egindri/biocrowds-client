@@ -108,16 +108,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
 
-			this.paths.forEach((p, i) => {
-				p.forEach(v => {
-					const geometry = new THREE.BoxGeometry(8, 8, 1);
-                	const point = new THREE.Mesh(geometry, materials[i]);
-						
-					point.position.set(v.x * 10, v.y * 10, -5);
-					point.rotation.set(0, 0, 1.5707 / 2);
-	                scene.add(point);
-				});
-			});
+			this.paths.forEach((p, i) => p.forEach(v => this.printPathPrediction(v.x * 10, v.y * 10, v.z * 10, materials[i], scene)));
 
             this.agentPositions[this.currentPosition].forEach((g, i) => {
 
@@ -187,12 +178,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
                 }
 				case 'prediction': {
-					const geometry = new THREE.BoxGeometry(8, 8, 1);
-                    const point = new THREE.Mesh(geometry, materials[this.groupIndex]);
-                    point.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
-					point.rotation.set(0, 0, 1.5707 / 2);
-
-                    scene.add(point);
+					this.printPathPrediction(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10, materials[this.groupIndex], scene);
 
 					if (this.clicking) {
 	
@@ -230,6 +216,15 @@ export class BioCrowdsComponent implements AfterViewInit {
     onMouseUp() {
 		this.clicking = false;
     }
+
+	printPathPrediction(x: number, y: number, z: number, material: THREE.Material, scene: THREE.Scene) {
+		const geometry = new THREE.BoxGeometry(6, 6, 1);
+        const point = new THREE.Mesh(geometry, material);
+        point.position.set(x, y, z);
+		point.rotation.set(0, 0, 1.5707 / 2);
+
+        scene.add(point);
+	}
 
     printLine(a: THREE.Vector3, b: THREE.Vector3, scene: THREE.Scene) {
 
