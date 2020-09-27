@@ -128,7 +128,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
 				this.infos[i] = new Info();
 
-                g.forEach((a, j) => {
+                g.forEach((a: THREE.Vector3, j) => {
                     
 					const nextPosition = this.agentPositions[this.currentPosition + 1];
 
@@ -140,30 +140,13 @@ export class BioCrowdsComponent implements AfterViewInit {
                     if (!nextAgentPosition) {
                         nextAgentPosition = a;
                     }
-					
-					this.infos[i].totalDistance += Math.sqrt(Math.pow(a.x - this.agentPositions[0][i][j].x, 2)
-										+ Math.pow(a.y - this.agentPositions[0][i][j].y, 2) 
-										+ Math.pow(a.z - this.agentPositions[0][i][j].z, 2));
-					
-					this.infos[i].averageDistance += Math.sqrt(Math.pow(a.x - this.agentPositions[0][i][j].x, 2)
-										+ Math.pow(a.y - this.agentPositions[0][i][j].y, 2) 
-										+ Math.pow(a.z - this.agentPositions[0][i][j].z, 2))/ g.length;
+
+					this.infos[i].totalDistance += new THREE.Vector3(a.x, a.y, a.z).distanceTo(this.agentPositions[0][i][j]);
+					this.infos[i].averageDistance += a.distanceTo(this.agentPositions[0][i][j]) / g.length;
+					this.infos[i].currentSpeed += nextAgentPosition.distanceTo(a) / g.length;
 										
-					this.infos[i].currentSpeed += Math.sqrt(Math.pow((nextAgentPosition.x - a.x) / g.length, 2)
-										+ Math.pow((nextAgentPosition.y - a.y) / g.length, 2) 
-										+ Math.pow((nextAgentPosition.z - a.z) / g.length, 2));
-										
-					this.infos[i].averageSpeed += Math.sqrt(Math.pow((a.x - this.agentPositions[0][i][j].x) / g.length, 2)
-										+ Math.pow((a.y - this.agentPositions[0][i][j].y) / g.length, 2) 
-										+ Math.pow((a.z - this.agentPositions[0][i][j].z) / g.length, 2));
-					
 					if (this.paths[i]) {
-						this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => 
-						Math.sqrt(Math.pow((a.x -  p.x)/ g.length, 2)
-											+ Math.pow((a.y -  p.y)/ g.length, 2) 
-											+ Math.pow((a.z -  p.z)/ g.length, 2))
-						
-						));
+						this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => a.distanceTo(p) / g.length));
 					}
 					
                     const agent = new THREE.Mesh(sphereGeometry, materials[i]);
@@ -221,12 +204,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 							this.paths[this.groupIndex].push(new THREE.Vector3(this.mousePosition.x, this.mousePosition.y, 0));
 						}
 					}
-
-                    break;
 				}
-                default: {
-
-                }
             }
 
             renderer.setSize(this.canvasWidth, this.canvasHeight);
@@ -258,10 +236,8 @@ export class BioCrowdsComponent implements AfterViewInit {
         for (let i = -5; i < 5; i++) {
             const pointsX = [];
             const pointsY = [];
-            const x = Math.abs(this.currentPoint.x - this.mousePosition.x);
-            const y = Math.abs(this.currentPoint.y - this.mousePosition.y);
-            pointsX.push( new THREE.Vector3(a.x * 10, a.y * 10+i, -10 ) );
-            pointsX.push( new THREE.Vector3(b.x * 10, b.y * 10+i, -10 ) );
+            pointsX.push( new THREE.Vector3(a.x * 10, a.y * 10 + i, -10 ) );
+            pointsX.push( new THREE.Vector3(b.x * 10, b.y * 10 + i, -10 ) );
             pointsY.push( new THREE.Vector3(a.x * 10 + i, a.y * 10, -10 ) );
             pointsY.push( new THREE.Vector3(b.x * 10 + i, b.y * 10, -10 ) );
 
@@ -271,18 +247,17 @@ export class BioCrowdsComponent implements AfterViewInit {
             const geometryY = new THREE.BufferGeometry().setFromPoints( pointsY );
             const lineY = new THREE.Line( geometryY, this.obstacleMaterial );
 
-            scene.add( lineX );
-            scene.add( lineY );
+            scene.add(lineX);
+            scene.add(lineY);
         }
     }
 
     addObject() {
         this.dirty = true;
 		
-        if (this.selectedTool === 'agent') {
-            if (this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
-                this.agentPositions[0][this.groupIndex].push(this.mousePosition);
-            }
+        if (this.selectedTool === 'agent'
+         && this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
+            this.agentPositions[0][this.groupIndex].push(this.mousePosition);
         } else if (this.selectedTool === 'goal') {
             this.goals[this.groupIndex] = this.mousePosition;
         } else if (this.selectedTool === 'removal') {
@@ -290,13 +265,9 @@ export class BioCrowdsComponent implements AfterViewInit {
             this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
 			
 			this.paths.forEach((p, i) => {
-				p.forEach(v => {
-					if (v.x === this.mousePosition.x && v.y === this.mousePosition.y) {
-						this.paths[i] = [];	
-					}	
-				});			
+				p.filter(v => v.x === this.mousePosition.x && v.y === this.mousePosition.y)
+				 .forEach(v => this.paths[i] = []);			
 			});
-			
         } else if (this.selectedTool === 'obstacle') {
             if (this.currentPoint.x >= 0) {
                 this.obstacles.push({a: this.currentPoint, b: this.mousePosition})
@@ -338,7 +309,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
             this.bioCrowdsService.simulate(world, 200, this.randomPaths ? 100 : 0).subscribe(
                                                         res => {
-                                                            this.agentPositions = res.positions;
+                                                            this.agentPositions = res.positions.map(p => p.map(g => g.map(a => new THREE.Vector3(a.x, a.y, a.z))));
                                                             this.currentPosition = 1;
                                                             this.loading = false;
                                                             this.dirty = false;
@@ -373,8 +344,7 @@ export class BioCrowdsComponent implements AfterViewInit {
         world.obstacles = this.obstacles;
         world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
-        this.bioCrowdsService.save(world).subscribe(
-                                                    res => {
+        this.bioCrowdsService.save(world).subscribe(res => {
                                                         this.currentPosition = 0;
                                                         this.loading = false;
                                                         this.dirty = false;
@@ -384,7 +354,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                                                     error => {
                                                         alert(error.error.message);
                                                         this.loading = false;
-                                                        });
+                                                    });
     }
 
     handleChange(event: Event, index: number) {
