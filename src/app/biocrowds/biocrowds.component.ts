@@ -61,6 +61,7 @@ export class BioCrowdsComponent implements AfterViewInit {
     obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
 
 	elapsedTime = 0;
+	
 
     constructor(private bioCrowdsService: BioCrowdsService, private location: Location, @Inject(APP_BASE_HREF) public baseHref: string) {}
 
@@ -139,10 +140,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 						this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => a.distanceTo(p) / g.length));
 					}
 					
-                    const agent = new THREE.Mesh(this.sphereGeometry, this.materials[i]);
-                    agent.position.set((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, a.z * nextAgentPosition.z * this.delta * 20);
-                    
-                    scene.add(agent);
+                    this.printAgent((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, 0, this.materials[i], scene);
             	});
 			});
 
@@ -184,43 +182,46 @@ export class BioCrowdsComponent implements AfterViewInit {
 
 	printSelectedTool(scene: THREE.Scene) {
 		
-            switch (this.selectedTool) {
-                case 'agent': {
-                    const agent = new THREE.Mesh(this.sphereGeometry, this.materials[this.groupIndex]);
-                    agent.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+        switch (this.selectedTool) {
+            case 'agent': {
+				this.printAgent(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10, this.materials[this.groupIndex], scene);
+                break;
+            }
+            case 'obstacle': {
+                const point = new THREE.Mesh(this.sphereGeometry, this.obstacleMaterial);
+                if (this.currentPoint.x < 0) {
+                    point.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
 
-                    scene.add(agent);
-                    break;
+                    scene.add(point);
+                } else {
+                    this.printLine(this.currentPoint, this.mousePosition, scene);
                 }
-                case 'obstacle': {
-                    const point = new THREE.Mesh(this.sphereGeometry, this.obstacleMaterial);
-                    if (this.currentPoint.x < 0) {
-                        point.position.set(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10);
+                break;
+            }
+			case 'prediction': {
+				this.printPathPrediction(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10, this.materials[this.groupIndex], scene);
 
-                        scene.add(point);
-                    } else {
-                        this.printLine(this.currentPoint, this.mousePosition, scene);
-                    }
-                    break;
+				if (this.clicking) {
 
-                }
-				case 'prediction': {
-					this.printPathPrediction(this.mousePosition.x * 10, this.mousePosition.y * 10, this.mousePosition.z * 10, this.materials[this.groupIndex], scene);
-
-					if (this.clicking) {
-	
-						if (!this.paths[this.groupIndex]) {
-							this.paths[this.groupIndex] = [];
-						}					
-						
-						if (this.paths.flat().filter(a => a.x == this.mousePosition.x && a.y == this.mousePosition.y).length === 0) {
-							this.paths[this.groupIndex].push(new THREE.Vector3(this.mousePosition.x, this.mousePosition.y, 0));
-						}
+					if (!this.paths[this.groupIndex]) {
+						this.paths[this.groupIndex] = [];
+					}
+					
+					if (this.paths.flat().filter(a => a.x == this.mousePosition.x && a.y == this.mousePosition.y).length === 0) {
+						this.paths[this.groupIndex].push(new THREE.Vector3(this.mousePosition.x, this.mousePosition.y, 0));
 					}
 				}
-            }	
+			}
+        }	
 	}
 
+	printAgent(x: number, y: number, z: number, material: THREE.Material, scene: THREE.Scene) {
+		const agent = new THREE.Mesh(this.sphereGeometry, material);
+        agent.position.set(x, y, z);
+        
+        scene.add(agent);
+	}
+	
 	printPathPrediction(x: number, y: number, z: number, material: THREE.Material, scene: THREE.Scene) {
 		const geometry = new THREE.BoxGeometry(6, 6, 1);
         const point = new THREE.Mesh(geometry, material);
@@ -358,7 +359,6 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     handleChange(event: Event, index: number) {
         const element = event.target as HTMLInputElement;
-        //this.selectedTool = element.value as unknown as Tool;
         this.selectedTool = element.value;
         this.currentPosition = 0;
         this.groupIndex = index;
