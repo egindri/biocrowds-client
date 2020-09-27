@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SimulationResponse } from './simulationResponse';
+import { WorldResponse } from './worldResponse';
 
 import { environment } from './../../../environments/environment';
 
@@ -19,7 +20,7 @@ export class BioCrowdsService {
         return this.http.post(environment.apiUrl, world, {observe: 'response'});
     }
 
-    find(id: string): Observable<any> {
-        return this.http.get(environment.apiUrl + id);
+    find(id: string): Observable<WorldResponse> {
+        return this.http.get<WorldResponse>(environment.apiUrl + id);
     }
 }
