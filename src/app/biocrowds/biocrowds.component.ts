@@ -34,7 +34,6 @@ export class BioCrowdsComponent implements AfterViewInit {
 	newPath = [];
 	infos: Info[] = [];
 
-    orthographicCamera = true;
     playing = false;
     dirty = true;
     loading = false;
@@ -83,81 +82,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         const animate = () => {
             requestAnimationFrame(animate);
-
-            this.delta += this.currentPosition > 0 ? this.clock.getDelta() : 0;
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xEEEEEE);
-
-            this.canvasWidth = window.innerWidth;
-            this.canvasHeight = window.innerHeight;
-
-            let camera: THREE.Camera;
-            if (this.orthographicCamera) {
-                camera = new THREE.OrthographicCamera(this.container.nativeElement.offsetLeft,
-                                                      this.container.nativeElement.offsetLeft + this.canvasWidth,
-                                                      this.container.nativeElement.offsetTop,
-                                                      this.container.nativeElement.offsetTop + this.canvasHeight,
-                                                      -10, 10);
-            } else {
-                camera = new THREE.PerspectiveCamera(75, this.canvasWidth / this.canvasHeight, 0.1, 1000);
-                camera.position.z = 15;
-            }
-
-			this.elapsedTime = this.currentPosition > 0 ? this.clock.getElapsedTime() : 0
-
-            this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
-
-			this.paths.forEach((p, i) => p.forEach(v => this.printPathPrediction(v.x * 10, v.y * 10, v.z * 10, this.materials[i], scene)));
-
-            this.agentPositions[this.currentPosition].forEach((g, i) => {
-
-                const geometry = new THREE.RingGeometry(20, 8, 20);
-                const goal = new THREE.Mesh(geometry, this.materials[i]);
-                goal.position.set(this.goals[i].x * 10, this.goals[i].y * 10, -5);
-                scene.add(goal);
-
-				this.infos[i] = new Info();
-
-                g.forEach((a: THREE.Vector3, j) => {
-                    
-					const nextPosition = this.agentPositions[this.currentPosition + 1];
-
-                    let nextAgentPosition: THREE.Vector3;
-                    if (nextPosition && nextPosition[i]) {
-                        nextAgentPosition = nextPosition[i][j];
-                    }
-
-                    if (!nextAgentPosition) {
-                        nextAgentPosition = a;
-                    }
-
-					this.infos[i].totalDistance += new THREE.Vector3(a.x, a.y, a.z).distanceTo(this.agentPositions[0][i][j]);
-					this.infos[i].averageDistance += a.distanceTo(this.agentPositions[0][i][j]) / g.length;
-					this.infos[i].currentSpeed += nextAgentPosition.distanceTo(a) / g.length;
-										
-					if (this.paths[i]) {
-						this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => a.distanceTo(p) / g.length));
-					}
-					
-                    this.printAgent((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, 0, this.materials[i], scene);
-            	});
-			});
-
-            if (this.delta > 0.1) {
-
-                this.delta = 0;
-                if (this.currentPosition === this.agentPositions.length - 1) {
-                    this.selectedTool = null;
-                } else if (this.currentPosition > 0) {
-                    this.currentPosition++;
-                }
-            }
-
-			this.printSelectedTool(scene);
-
-            renderer.setSize(this.canvasWidth, this.canvasHeight);
-            renderer.render(scene, camera);
+			this.handleFrame(renderer);
         };
 
         animate();
@@ -179,6 +104,82 @@ export class BioCrowdsComponent implements AfterViewInit {
     onMouseUp() {
 		this.clicking = false;
     }
+
+	handleFrame(renderer: THREE.WebGLRenderer) {
+		this.delta += this.currentPosition > 0 ? this.clock.getDelta() : 0;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xEEEEEE);
+
+        this.canvasWidth = window.innerWidth;
+        this.canvasHeight = window.innerHeight;
+
+        let camera = new THREE.OrthographicCamera(this.container.nativeElement.offsetLeft,
+                                                  this.container.nativeElement.offsetLeft + this.canvasWidth,
+                                                  this.container.nativeElement.offsetTop,
+                                                  this.container.nativeElement.offsetTop + this.canvasHeight,
+                                                  -10, 10);
+
+		this.elapsedTime = this.currentPosition > 0 ? this.clock.getElapsedTime() : 0
+
+        this.printObjects(scene);
+
+        if (this.delta > 0.1) {
+
+            this.delta = 0;
+            if (this.currentPosition === this.agentPositions.length - 1) {
+                this.selectedTool = null;
+            } else if (this.currentPosition > 0) {
+                this.currentPosition++;
+            }
+        }
+
+        renderer.setSize(this.canvasWidth, this.canvasHeight);
+        renderer.render(scene, camera);
+	}
+
+	printObjects(scene: THREE.Scene) {
+		
+        this.obstacles.forEach(o => this.printLine(o.a, o.b, scene));
+
+		this.paths.forEach((p, i) => p.forEach(v => this.printPathPrediction(v.x * 10, v.y * 10, v.z * 10, this.materials[i], scene)));
+
+		this.agentPositions[this.currentPosition].forEach((g, i) => {
+
+	        const geometry = new THREE.RingGeometry(20, 8, 20);
+	        const goal = new THREE.Mesh(geometry, this.materials[i]);
+	        goal.position.set(this.goals[i].x * 10, this.goals[i].y * 10, -5);
+	        scene.add(goal);
+	
+			this.infos[i] = new Info();
+	
+	        g.forEach((a: THREE.Vector3, j) => {
+	            
+				const nextPosition = this.agentPositions[this.currentPosition + 1];
+	
+	            let nextAgentPosition: THREE.Vector3;
+	            if (nextPosition && nextPosition[i]) {
+	                nextAgentPosition = nextPosition[i][j];
+	            }
+	
+	            if (!nextAgentPosition) {
+	                nextAgentPosition = a;
+	            }
+	
+				this.infos[i].totalDistance += new THREE.Vector3(a.x, a.y, a.z).distanceTo(this.agentPositions[0][i][j]);
+				this.infos[i].averageDistance += a.distanceTo(this.agentPositions[0][i][j]) / g.length;
+				this.infos[i].currentSpeed += nextAgentPosition.distanceTo(a) / g.length;
+									
+				if (this.paths[i]) {
+					this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => a.distanceTo(p) / g.length));
+				}
+				
+	            this.printAgent((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, 0, this.materials[i], scene);
+		    });
+	    });
+
+		this.printSelectedTool(scene);
+	}
 
 	printSelectedTool(scene: THREE.Scene) {
 		
@@ -279,16 +280,9 @@ export class BioCrowdsComponent implements AfterViewInit {
     }
 
     obtainMousePosition(event: MouseEvent) {
-        let x: number;
-        let y: number;
 
-        if (this.orthographicCamera) {
-            x = event.clientX;
-            y = event.clientY;
-        } else {
-            x = ((event.clientX - this.container.nativeElement.offsetLeft) / this.canvasWidth) * 2 - 1;
-            y = -((event.clientY - this.container.nativeElement.offsetTop) / this.canvasHeight) * 2 + 1;
-        }
+        let x = event.clientX;
+        let y = event.clientY;
 
         return new THREE.Vector3(Math.round(x / 10), Math.round(y / 10), 0);
     }
@@ -330,10 +324,6 @@ export class BioCrowdsComponent implements AfterViewInit {
             this.agentPositions[0].push([]);
             this.goals.push(new THREE.Vector3(Math.round(Math.random() * (100) + 10), Math.round(Math.random() * (100) + 10), 0));
         }
-    }
-
-    pause() {
-
     }
 
     save() {
