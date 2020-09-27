@@ -14,7 +14,6 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     @ViewChild('container') container: ElementRef;
 
-	
     materials = [new THREE.MeshBasicMaterial({color: 0xaa7aff}),
                 new THREE.MeshBasicMaterial({color: 0xff73e1}),
                	new THREE.MeshBasicMaterial({color: 0x45f0e0}),
@@ -22,7 +21,7 @@ export class BioCrowdsComponent implements AfterViewInit {
                	new THREE.MeshBasicMaterial({color: 0x78a1ff})];
 
     sphereGeometry = new THREE.SphereGeometry(5);
-
+	ringGeometry = new THREE.RingGeometry(20, 4, 20);
 
     canvasWidth: number;
     canvasHeight: number;
@@ -146,8 +145,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
 		this.agentPositions[this.currentPosition].forEach((g, i) => {
 
-	        const geometry = new THREE.RingGeometry(20, 8, 20);
-	        const goal = new THREE.Mesh(geometry, this.materials[i]);
+	        const goal = new THREE.Mesh(this.ringGeometry, this.materials[i]);
 	        goal.position.set(this.goals[i].x * 10, this.goals[i].y * 10, -5);
 	        scene.add(goal);
 	
@@ -160,25 +158,27 @@ export class BioCrowdsComponent implements AfterViewInit {
 	            let nextAgentPosition: THREE.Vector3;
 	            if (nextPosition && nextPosition[i]) {
 	                nextAgentPosition = nextPosition[i][j];
+	            } else {
+		        	nextAgentPosition = a;
 	            }
-	
-	            if (!nextAgentPosition) {
-	                nextAgentPosition = a;
-	            }
-	
-				this.infos[i].totalDistance += new THREE.Vector3(a.x, a.y, a.z).distanceTo(this.agentPositions[0][i][j]);
-				this.infos[i].averageDistance += a.distanceTo(this.agentPositions[0][i][j]) / g.length;
-				this.infos[i].currentSpeed += nextAgentPosition.distanceTo(a) / g.length;
-									
-				if (this.paths[i]) {
-					this.infos[i].averageDivergence +=  Math.min(...this.paths[i].map(p => a.distanceTo(p) / g.length));
-				}
+				
+				this.printInfo(i, a, g.length, this.agentPositions[0][i][j], nextAgentPosition);
 				
 	            this.printAgent((a.x + (nextAgentPosition.x - a.x) * this.delta * 10) * 10, (a.y + (nextAgentPosition.y - a.y) * this.delta * 10) * 10, 0, this.materials[i], scene);
 		    });
 	    });
 
 		this.printSelectedTool(scene);
+	}
+	
+	printInfo(groupIndex: number, agentPosition: THREE.Vector3, numberOfAgents: number, currentAgentInitialPosition: THREE.Vector3, nextAgentPosition: THREE.Vector3) {
+		this.infos[groupIndex].totalDistance += new THREE.Vector3(agentPosition.x, agentPosition.y, agentPosition.z).distanceTo(currentAgentInitialPosition);
+		this.infos[groupIndex].averageDistance += agentPosition.distanceTo(currentAgentInitialPosition) / numberOfAgents;
+		this.infos[groupIndex].currentSpeed += nextAgentPosition.distanceTo(agentPosition) / numberOfAgents;
+							
+		if (this.paths[groupIndex]) {
+			this.infos[groupIndex].averageDivergence +=  Math.min(...this.paths[groupIndex].map(p => agentPosition.distanceTo(p) / numberOfAgents));
+		}
 	}
 
 	printSelectedTool(scene: THREE.Scene) {
@@ -256,26 +256,31 @@ export class BioCrowdsComponent implements AfterViewInit {
     addObject() {
         this.dirty = true;
 		
-        if (this.selectedTool === 'agent'
-         && this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y)).reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
-            this.agentPositions[0][this.groupIndex].push(this.mousePosition);
-        } else if (this.selectedTool === 'goal') {
-            this.goals[this.groupIndex] = this.mousePosition;
-        } else if (this.selectedTool === 'removal') {
-            this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
-            this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
-			
-			this.paths.forEach((p, i) => {
-				p.filter(v => v.x === this.mousePosition.x && v.y === this.mousePosition.y)
-				 .forEach(_v => this.paths[i] = []);
-			});
-        } else if (this.selectedTool === 'obstacle') {
-            if (this.currentPoint.x >= 0) {
-                this.obstacles.push({a: this.currentPoint, b: this.mousePosition})
-                this.currentPoint = new THREE.Vector3(-1, -1, -1);
-            } else {
-                this.currentPoint = this.mousePosition;
-            }
+        switch (this.selectedTool) {
+			case 'agent': {
+				
+	         	if (this.agentPositions[0].map(g => g.filter(a => a.x === this.mousePosition.x && a.y === this.mousePosition.y))
+										  .reduce((accumulator, value) => accumulator.concat(value), []).length === 0) {
+	            	this.agentPositions[0][this.groupIndex].push(this.mousePosition);
+				}
+			}
+			case 'goal': {
+            	this.goals[this.groupIndex] = this.mousePosition;
+        	} 
+			case 'removal': {
+	            this.agentPositions[0] = this.agentPositions[0].map(g => g.filter(a => a.x !== this.mousePosition.x || a.y !== this.mousePosition.y));
+	            this.obstacles = this.obstacles.filter(o => Math.abs(o.a.distanceTo(this.mousePosition) + this.mousePosition.distanceTo(o.b) - o.a.distanceTo(o.b)) > 0.05);
+				
+				this.paths.forEach((p, i) => p.filter(v => v.x === this.mousePosition.x && v.y === this.mousePosition.y).forEach(_v => this.paths[i] = []));
+        	} 
+			case 'obstacle': {
+	            if (this.currentPoint.x >= 0) {
+	                this.obstacles.push({a: this.currentPoint, b: this.mousePosition});
+	                this.currentPoint = new THREE.Vector3(-1, -1, -1);
+	            } else {
+	                this.currentPoint = this.mousePosition;
+	            }
+			}
         }
     }
 
