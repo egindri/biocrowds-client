@@ -26,9 +26,9 @@ export class BioCrowdsComponent implements AfterViewInit {
     canvasWidth: number;
     canvasHeight: number;
 
-    agentPositions = [[[new THREE.Vector3(40, 20, 0), new THREE.Vector3(50, 20, 0)]]];
-    goals: THREE.Vector3[] = [new THREE.Vector3(80, 50, 0)];
-    obstacles: any[] = [{a: new THREE.Vector3(50, 50, 0), b: new THREE.Vector3(60, 60, 0)}];
+    agentPositions: THREE.Vector3[][][] = [[[]]];
+    goals: THREE.Vector3[] = [new THREE.Vector3(window.innerWidth / 20, window.innerHeight / 20, 0)];
+    obstacles: any[] = [];
 	paths: THREE.Vector3[][] = [];
 	newPath = [];
 	infos: Info[] = [];
