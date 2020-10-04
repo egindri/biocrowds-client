@@ -314,7 +314,7 @@ export class BioCrowdsComponent implements AfterViewInit {
             const world: any = {};
             world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
             world.obstacles = this.obstacles;
-            world.dimensions = new THREE.Vector3(1000, 1000, 1000);
+            world.dimensions = new THREE.Vector2(1000, 1000);
 
             this.bioCrowdsService.simulate(world, 200, this.randomPaths ? 100 : 0).subscribe(
                                                         res => {
