@@ -181,7 +181,10 @@ export class BioCrowdsComponent implements AfterViewInit {
 	printInfo(groupIndex: number, agentPosition: THREE.Vector3, numberOfAgents: number, currentAgentInitialPosition: THREE.Vector3, nextAgentPosition: THREE.Vector3) {
 		this.infos[groupIndex].totalDistance += new THREE.Vector3(agentPosition.x, agentPosition.y, agentPosition.z).distanceTo(currentAgentInitialPosition);
 		this.infos[groupIndex].averageDistance += agentPosition.distanceTo(currentAgentInitialPosition) / numberOfAgents;
-		this.infos[groupIndex].currentSpeed += nextAgentPosition.distanceTo(agentPosition) / numberOfAgents;
+		
+		if (nextAgentPosition) {
+			this.infos[groupIndex].currentSpeed += nextAgentPosition.distanceTo(agentPosition) / numberOfAgents;
+		}
 							
 		if (this.paths[groupIndex]) {
 			this.infos[groupIndex].averageDivergence +=  Math.min(...this.paths[groupIndex].map(p => agentPosition.distanceTo(p) / numberOfAgents));
