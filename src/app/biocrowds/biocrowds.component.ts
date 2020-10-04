@@ -69,10 +69,13 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         if (id) {
             this.bioCrowdsService.find(id).subscribe(res => {
-                                                   		this.agentPositions[0] = res.agentGroups.map(ag => ag.agentInitialPositions.map(p => new THREE.Vector3(p.x, p.y, p.z)));
-                                                        this.goals = res.agentGroups.map(ag => ag.goal);
                                                         this.obstacles = res.obstacles;
-                                                    })
+		
+														const agentGroups = res.agentGroups;
+                                                   		this.agentPositions[0] = agentGroups.map(ag => ag.agentInitialPositions.map(p => new THREE.Vector3(p.x, p.y, p.z)));
+                                                        this.paths = agentGroups.map(ag => ag.pathPredictions.map(p => new THREE.Vector3(p.x, p.y, p.z)))
+														this.goals = agentGroups.map(ag => ag.goal);
+													});
         }
 
         const renderer = new THREE.WebGLRenderer();
@@ -113,10 +116,14 @@ export class BioCrowdsComponent implements AfterViewInit {
         this.canvasWidth = window.innerWidth;
         this.canvasHeight = window.innerHeight;
 
-        let camera = new THREE.OrthographicCamera(this.container.nativeElement.offsetLeft,
-                                                  this.container.nativeElement.offsetLeft + this.canvasWidth,
-                                                  this.container.nativeElement.offsetTop,
-                                                  this.container.nativeElement.offsetTop + this.canvasHeight,
+		const nativeElement = this.container.nativeElement;
+		const offsetLeft = nativeElement.offsetLeft;
+		const offsetTop = nativeElement.offsetTop;
+
+        let camera = new THREE.OrthographicCamera(offsetLeft,
+                                                  offsetLeft + this.canvasWidth,
+                                                  offsetTop,
+                                                  offsetTop + this.canvasHeight,
                                                   -10, 10);
 
 		this.elapsedTime = this.currentPosition > 0 ? this.clock.getElapsedTime() : 0
@@ -338,7 +345,9 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         this.loading = true;
         const world: any = {};
-        world.agentGroups = this.agentPositions[0].map((g, i) => {return {goal: this.goals[i], agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
+        world.agentGroups = this.agentPositions[0].map((g, i) => {return {	goal: this.goals[i], 
+																			pathPredictions: this.paths[i], 
+																			agentInitialPositions: g.map(a => new THREE.Vector3(a.x, a.y, a.z))}});
         world.obstacles = this.obstacles;
         world.dimensions = new THREE.Vector3(1000, 1000, 1000);
 
