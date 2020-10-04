@@ -4,5 +4,8 @@ export class WorldResponse {
 		pathPredictions: THREE.Vector3[],
 		goal: THREE.Vector3
 	}[];
-	obstacles: any[];
+	obstacles: {
+		a: THREE.Vector3,
+		b: THREE.Vector3
+	}[];
 }

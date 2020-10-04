@@ -69,7 +69,8 @@ export class BioCrowdsComponent implements AfterViewInit {
 
         if (id) {
             this.bioCrowdsService.find(id).subscribe(res => {
-                                                        this.obstacles = res.obstacles;
+                                                        this.obstacles = res.obstacles.map(o => {return {a: new THREE.Vector3(o.a.x, o.a.y, o.a.z), 
+																										 b: new THREE.Vector3(o.b.x, o.b.y, o.b.z)}});
 		
 														const agentGroups = res.agentGroups;
                                                    		this.agentPositions[0] = agentGroups.map(ag => ag.agentInitialPositions.map(p => new THREE.Vector3(p.x, p.y, p.z)));
