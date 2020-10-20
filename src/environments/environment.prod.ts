@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://191.238.222.128/world/'
+  apiUrl: 'https://biocrowds-server.ml/world/'
 };
