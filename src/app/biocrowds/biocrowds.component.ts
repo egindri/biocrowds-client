@@ -56,7 +56,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     currentPoint = new THREE.Vector3(-1, -1, -1);
 
-    obstacleMaterial = new THREE.MeshBasicMaterial({color: 0xff9038});
+    obstacleMaterial = new THREE.LineBasicMaterial({color: 0xff9038, linewidth: 10});
 
 	elapsedTime = 0;
 	
@@ -74,11 +74,18 @@ export class BioCrowdsComponent implements AfterViewInit {
 		
 														const agentGroups = res.agentGroups;
                                                    		this.agentPositions[0] = agentGroups.map(ag => ag.agentInitialPositions.map(p => new THREE.Vector3(p.x, p.y, p.z)));
-                                                        this.paths = agentGroups.map(ag => ag.pathPredictions.map(p => new THREE.Vector3(p.x, p.y, p.z)))
+                                                        
+														this.paths = agentGroups.map(ag => ag.pathPredictions ? ag.pathPredictions.map(p => new THREE.Vector3(p.x, p.y, p.z)) : [])
 														this.goals = agentGroups.map(ag => ag.goal);
+														this.start();
 													});
-        }
+        } else {
+			this.start();
+		}
+    }
 
+	start() {
+		
         const renderer = new THREE.WebGLRenderer();
 
         this.container.nativeElement.appendChild(renderer.domElement);
@@ -89,7 +96,7 @@ export class BioCrowdsComponent implements AfterViewInit {
         };
 
         animate();
-    }
+	}
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent) {
@@ -187,8 +194,8 @@ export class BioCrowdsComponent implements AfterViewInit {
 			this.infos[groupIndex].currentSpeed += nextAgentPosition.distanceTo(agentPosition) / numberOfAgents;
 		}
 							
-		if (this.paths[groupIndex]) {
-			this.infos[groupIndex].averageDivergence +=  Math.min(...this.paths[groupIndex].map(p => agentPosition.distanceTo(p) / numberOfAgents));
+		if (this.paths[groupIndex].length > 0) {
+			this.infos[groupIndex].averageDivergence += Math.min(...this.paths[groupIndex].map(p => agentPosition.distanceTo(p) / numberOfAgents));
 		}
 	}
 
@@ -245,7 +252,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 
     printLine(a: THREE.Vector3, b: THREE.Vector3, scene: THREE.Scene) {
 
-        for (let i = -5; i < 5; i++) {
+        for (let i = -2; i < 2; i++) {
             const pointsX = [];
             const pointsY = [];
             pointsX.push( new THREE.Vector3(a.x * 10, a.y * 10 + i, -10 ) );
