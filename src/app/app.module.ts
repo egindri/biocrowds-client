@@ -7,7 +7,8 @@ import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 
 import { AppComponent } from './app.component';
 import { BioCrowdsComponent } from './biocrowds/biocrowds.component';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,9 @@ import { BioCrowdsComponent } from './biocrowds/biocrowds.component';
     BrowserModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+	MatTooltipModule
   ],
   providers: [BioCrowdsService, {provide: APP_BASE_HREF,
       useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),

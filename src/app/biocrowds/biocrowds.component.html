@@ -1,19 +1,19 @@
 <div class="biocrowds">
 	<div class="top-left-column">
 		<div class="tools">
-			<label class="tool">
+			<label matTooltip="Play" class="tool">
 				<input type="radio" name="tool" value="play" (click)="play()">
 				<img class="checkmark play" src="assets/images/play.png">
 			</label>
-			<label class="tool">
+			<label matTooltip="Save" class="tool">
 				<input type="radio" name="tool" value="save" (click)="save()">
 				<img class="checkmark save" src="assets/images/save.png">
 			</label>
-			<label class="tool">
+			<label matTooltip="Obstacle" class="tool">
 				<input type="radio" name="tool" value="obstacle" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
 				<img class="checkmark obstacle" src="assets/images/obstacle.png">
 			</label>
-			<label class="tool">
+			<label matTooltip="Remove" class="tool">
 				<input type="radio" name="tool" value="removal" (change)="handleChange($event, 0)" [ngModel]="selectedTool">
 				<img class="checkmark remove" src="assets/images/remove.png">
 			</label>
@@ -21,7 +21,7 @@
 	</div>
 	<div class="bottom-left-column">
 		<div class="tools">
-			<label class="tool">
+			<label matTooltip="Randomize Paths" class="tool">
 				<input type="checkbox" [(ngModel)]="randomPaths" (change)="changeOptions()">
 				<img class="checkmark random" src="assets/images/random.png">
 			</label>
@@ -31,26 +31,26 @@
 		<div class="agents">
 			<div *ngFor="let group of agentPositions[0];let i = index">
 				<div class="agentGroup">
-					<label class="tool">
+					<label matTooltip="Agent" class="tool">
 						<input type="radio" name="tool" value="agent" (change)="handleChange($event, i)">
 						<img class="checkmark group{{i}}" src="assets/images/person.png">
 					</label>
 				</div>
 				<div class="agentGroup">
-					<label class="tool">
+					<label matTooltip="Goal" class="tool">
 						<input type="radio" name="tool" value="goal" (change)="handleChange($event, i)">
 						<img class="checkmark group{{i}}" src="assets/images/target.png">
 					</label>
 				</div>
 				<div class="agentGroup">
-					<label class="tool">
+					<label matTooltip="Path" class="tool">
 						<input type="radio" name="tool" value="prediction" (change)="handleChange($event, i)">
 						<img class="checkmark group{{i}}" src="assets/images/curved-arrow.png">
 					</label>
 				</div>
 			</div>
 			<div class="addAgentGroup" *ngIf="agentPositions[0].length < 5">
-				<label class="tool">
+				<label matTooltip="Add group" class="tool">
 					<input type="radio" name="tool" value="add" (click)="addGroup()" [ngModel]="selectedTool">
 					<img class="checkmark goal" src="assets/images/remove.png">
 				</label>
