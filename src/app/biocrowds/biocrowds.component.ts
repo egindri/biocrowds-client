@@ -194,7 +194,7 @@ export class BioCrowdsComponent implements AfterViewInit {
 			this.infos[groupIndex].currentSpeed += nextAgentPosition.distanceTo(agentPosition) / numberOfAgents;
 		}
 							
-		if (this.paths[groupIndex].length > 0) {
+		if (this.paths[groupIndex] && this.paths[groupIndex].length > 0) {
 			this.infos[groupIndex].averageDivergence += Math.min(...this.paths[groupIndex].map(p => agentPosition.distanceTo(p) / numberOfAgents));
 		}
 	}
